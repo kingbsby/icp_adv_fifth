@@ -13,37 +13,53 @@ const content = () => html`<section class="container">
     <div>
         <label>Your Identity : </label>
         <label id="whoami"></label>
-        <button id="logout" style="float:right">log out</button>
+        <button id="logout">log out</button>
     </div>
     ------------------------------------------------------------------
     <div>
-        <H3>Team Member List:</H3>
-        <input id="input_member" placeholder="input principal here"></input>
+        <input id="input_member" placeholder="input principal here" size=60></input>
         <button id="btn_add_member">add member</button>
         <button id="btn_del_member">delete member</button>
+    </div>
+    <div>
+        <H3>Team Member List:</H3>
         <section id="members"></section>
         <!--<button id="refresh_canister">refresh canisters</button>-->
     </div>
     ------------------------------------------------------------------
     <div>
+        Create a new canister : <button id="btn_create_canister">new</button>   
+    </div>
+    <br />
+    <div>
+        Initiate a proposal for canister:
+        <br />
+        <div>
+        Proposal content : <input id="input_proposal_text" placeholder="input proposal content" size=30></input>
+        </div>
+        <div>
+        Proposal method : <select id="selectList">
+            <option>install Code</option>
+            <option>start</option>
+            <option>stop</option>
+            <option>delete</option>
+            <option>add Restriction</option>
+            <option>remove Restriction</option>
+        </select>
+        </div>
+        <div>
+            Wasm file : <input type="file" id="file" />
+        </div>
+        <div>
+        Target principal : <input id="input_proposal_target" placeholder="input target canister" size=60></input>
+        </div>
+        <button id="btn_canister_proposal">initiate</button>
+    </div>
+    <div>
         <section>
             <H3>Canister List:</H3>
-            <button id="refresh_canister" style="float:right">refresh canisters</button>
-            <button id="btn_create_canister" style="float:right">create canister</button>
-        </section>
-        <section>
-            <input id="input_proposal_text" placeholder="input proposal content"></input>
-            <select id="selectList">
-                <option>install Code</option>
-                <option>start</option>
-                <option>stop</option>
-                <option>delete</option>
-                <option>add Restriction</option>
-                <option>remove Restriction</option>
-            </select>
-            <input type="file" id="file" />
-            <input id="input_proposal_target" placeholder="input target canister"></input>
-            <button id="btn_canister_proposal">initiate canister proposal</button>
+            <!--<button id="refresh_canister" style="float:right">refresh canisters</button>-->
+            
         </section>
         <section id="canisters"></section>
     </div>
@@ -51,8 +67,8 @@ const content = () => html`<section class="container">
     <div>
         <p>
             <H3>Proposal List:</H3>
-            <button id="refresh_proposal" style="float:right">refresh proposals</button>
-            <button id="btn_create_proposal" style="float:right">Initiate a proposal</button>
+            <!--<button id="refresh_proposal" style="float:right">refresh proposals</button>-->
+            <!--<button id="btn_create_proposal" style="float:right">Initiate a proposal</button>-->
         </p>
         <section id="proposals"></section>
     </div>
@@ -72,31 +88,43 @@ export const renderLoggedIn = (actor, authClient) => {
         };
     };
 
-  document.getElementById("logout").onclick = async () => {
-    await authClient.logout();
-    renderIndex();
-  };
+    document.getElementById("logout").onclick = async () => {
+        await authClient.logout();
+        renderIndex();
+    };
 
-  document.getElementById("btn_add_member").onclick = async () => {
-    let principal = document.getElementById("input_member").value;
-    await icp_adv_fifth.add_proposal("add a member to group", {"addMember":null}, Principal.fromText(principal), []);
-    load_proposals();
-  };
+    document.getElementById("btn_add_member").onclick = async () => {
+        let principal = document.getElementById("input_member").value;
+        await icp_adv_fifth.add_proposal("add a member to group", {"addMember":null}, Principal.fromText(principal), []);
+        load_members();
+    };
 
-  document.getElementById("btn_del_member").onclick = async () => {
-    let principal = document.getElementById("input_member").value;
-    await icp_adv_fifth.add_proposal("remove a member from group", {"delMember":null}, Principal.fromText(principal), []);
-  };
+    document.getElementById("btn_del_member").onclick = async () => {
+        let principal = document.getElementById("input_member").value;
+        await icp_adv_fifth.add_proposal("remove a member from group", {"delMember":null}, Principal.fromText(principal), []);
+        load_members();
+    };
 
-  document.getElementById("btn_create_canister").onclick = async () => {
-    await icp_adv_fifth.create_canister();
-    load_canisters();
-  };
+    document.getElementById("btn_create_canister").onclick = async () => {
+        await icp_adv_fifth.create_canister();
+        load_canisters();
+    };
 
-  document.getElementById("btn_canister_proposal").onclick = async () => {
-    createProposal();
-    // load_proposals();
-  };
+    document.getElementById("btn_canister_proposal").onclick = async () => {
+        createProposal();
+        load_proposals();
+    };
+
+    let buf;
+    document.getElementById("file").onchange = function() {
+        const file = this.files[0]
+        const fr = new FileReader()
+        fr.readAsArrayBuffer(file)
+        fr.addEventListener('loadend', (e) => {
+            let aa = e.target.result
+            buf = new Uint8Array(aa)
+        })
+    };
 
 // 载入提案列表
 async function load_proposals() {
@@ -107,6 +135,7 @@ async function load_proposals() {
     for (var i = 0; i< proposals.length; i++) {
         var table = document.createElement("table");
         table.border = 1;
+        table.style.marginBottom = '10px'
         add_tr("proposal_id", proposals[i]["proposal_id"], table);
         add_tr("proposal_content", proposals[i]["proposal_content"], table);
         add_tr("proposal_maker", proposals[i]["proposal_maker"], table);
@@ -125,8 +154,9 @@ async function load_proposals() {
         o.value = "propose";
         o.addEventListener("click", async function(){
             await icp_adv_fifth.propose(id);
-            load_proposals();});   
+            load_proposals();});
         proposals_section.appendChild(o);
+        o.style.marginBottom = '10px'
     }
 };
 
@@ -172,32 +202,29 @@ async function load_members() {
 async function createProposal() {
     const content = document.getElementById('input_proposal_text').value;
     const file = document.getElementById('file').value;
-    const selected = document.getElementById('selectList').selected;
+    var selected = "";
+    switch(document.getElementById('selectList').selectedIndex){
+        case 0: selected = {"installCode":null}; break;
+        case 1: selected = {"start":null}; break;
+        case 2: selected = {"stop":null}; break;
+        case 3: selected = {"delete":null}; break;
+        case 4: selected = {"addRestriction":null}; break;
+        case 5: selected = {"removeRestriction":null}; break;
+    }
     const target = document.getElementById('input_proposal_target').value;
     console.log("select : " + selected);
-
-    arrayBuffer = await fileToBuf(file);
-    console.log("file : " + arrayBuffer);
-    
-}
-
-const fileToBuf = file => {
-    return new Promise(resolve => {
-        const fr = new FileReader()
-        fr.readAsArrayBuffer(file)
-        fr.addEventListener('loadend', (e) => {
-        const buf = e.target.result
-        resolve(buf)
-        })
-    })
+    console.log("file : " + buf);
+    console.log("target:" + target);
+    await icp_adv_fifth.add_proposal(content, selected, Principal.fromText(target), [buf]);
+    load_proposals();
 };
   
   function load() { 
     console.log("windows load");
-    let btn_refresh_proposal = document.getElementById("refresh_proposal");
-    btn_refresh_proposal.onclick = load_proposals;
-    let btn_refresh_canister = document.getElementById("refresh_canister");
-    btn_refresh_canister.onclick = load_canisters;
+    // let btn_refresh_proposal = document.getElementById("refresh_proposal");
+    // btn_refresh_proposal.onclick = load_proposals;
+    // let btn_refresh_canister = document.getElementById("refresh_canister");
+    // btn_refresh_canister.onclick = load_canisters;
   
     load_identity();
     load_members();
