@@ -41,6 +41,7 @@ const content = () => html`<section class="container">
                 <option>add Restriction</option>
                 <option>remove Restriction</option>
             </select>
+            <input type="file" id="file" />
             <input id="input_proposal_target" placeholder="input target canister"></input>
             <button id="btn_canister_proposal">initiate canister proposal</button>
         </section>
@@ -52,7 +53,6 @@ const content = () => html`<section class="container">
             <H3>Proposal List:</H3>
             <button id="refresh_proposal" style="float:right">refresh proposals</button>
             <button id="btn_create_proposal" style="float:right">Initiate a proposal</button>
-            
         </p>
         <section id="proposals"></section>
     </div>
@@ -93,9 +93,9 @@ export const renderLoggedIn = (actor, authClient) => {
     load_canisters();
   };
 
-  document.getElementById("btn_create_proposal").onclick = async () => {
+  document.getElementById("btn_canister_proposal").onclick = async () => {
     createProposal();
-    load_proposals();
+    // load_proposals();
   };
 
 // 载入提案列表
@@ -170,8 +170,27 @@ async function load_members() {
 }
 
 async function createProposal() {
+    const content = document.getElementById('input_proposal_text').value;
+    const file = document.getElementById('file').value;
+    const selected = document.getElementById('selectList').selected;
+    const target = document.getElementById('input_proposal_target').value;
+    console.log("select : " + selected);
+
+    arrayBuffer = await fileToBuf(file);
+    console.log("file : " + arrayBuffer);
     
 }
+
+const fileToBuf = file => {
+    return new Promise(resolve => {
+        const fr = new FileReader()
+        fr.readAsArrayBuffer(file)
+        fr.addEventListener('loadend', (e) => {
+        const buf = e.target.result
+        resolve(buf)
+        })
+    })
+};
   
   function load() { 
     console.log("windows load");
