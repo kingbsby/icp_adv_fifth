@@ -1,0 +1,45 @@
+type canister_id = principal;
+type anon_class_16_1 = 
+ service {
+   add_proposal: (text, ExecuteMethod, principal, opt blob) -> ();
+   allMembers: () -> (vec principal);
+   create_canister: () -> (canister_id);
+   delete_canister: (canister_id) -> ();
+   get_canisters: () -> (vec CanisterInfo);
+   get_proposals: () -> (vec Proposal);
+   install_code: (canister_id, opt blob) -> ();
+   propose: (nat) -> ();
+   start_canister: (canister_id) -> ();
+   stop_canister: (canister_id) -> ();
+   whoami: () -> (principal);
+ };
+type Proposal = 
+ record {
+   proposal_approvers: vec principal;
+   proposal_completed: bool;
+   proposal_content: text;
+   proposal_exe_method: ExecuteMethod;
+   proposal_exe_target: principal;
+   proposal_id: nat;
+   proposal_maker: principal;
+   proposal_total: nat;
+   proposal_wasm_hash: vec nat8;
+   proposal_wasm_module: opt blob;
+ };
+type ExecuteMethod = 
+ variant {
+   addMember;
+   addRestriction;
+   delMember;
+   delete;
+   installCode;
+   removeRestriction;
+   start;
+   stop;
+ };
+type CanisterInfo = 
+ record {
+   beRestricted: bool;
+   canister: canister_id;
+ };
+service : (nat, vec principal) -> anon_class_16_1
