@@ -1,0 +1,35 @@
+{
+  "canisters": {
+    "icp_adv_fifth": {
+      "main": "src/icp_adv_fifth/main.mo",
+      "type": "motoko"
+    },
+    "icp_adv_fifth_assets": {
+      "dependencies": [
+        "icp_adv_fifth"
+      ],
+      "frontend": {
+        "entrypoint": "src/icp_adv_fifth_assets/src/index.html"
+      },
+      "source": [
+        "src/icp_adv_fifth_assets/assets",
+        "dist/icp_adv_fifth_assets/"
+      ],
+      "type": "assets"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "dfx": "0.8.4",
+  "networks": {
+    "local": {
+      "bind": "127.0.0.1:8000",
+      "type": "ephemeral"
+    }
+  },
+  "version": 1
+}
