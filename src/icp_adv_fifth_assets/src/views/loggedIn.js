@@ -23,17 +23,15 @@ const content = () => html`<section class="container">
     </div>
     <div>
         <H3>Team Member List:</H3>
+        <button id="btn_refresh_members">refresh members</button>
         <section id="members"></section>
-        <!--<button id="refresh_canister">refresh canisters</button>-->
     </div>
     ------------------------------------------------------------------
     <div>
-        Create a new canister : <button id="btn_create_canister">new</button>   
+        <H3>Create a new canister : </H3><button id="btn_create_canister">new</button>   
     </div>
-    <br />
     <div>
-        Initiate a proposal for canister:
-        <br />
+        <H3>Initiate a proposal for canister:</H3>
         <div>
         Proposal content : <input id="input_proposal_text" placeholder="input proposal content" size=30></input>
         </div>
@@ -58,8 +56,7 @@ const content = () => html`<section class="container">
     <div>
         <section>
             <H3>Canister List:</H3>
-            <!--<button id="refresh_canister" style="float:right">refresh canisters</button>-->
-            
+            <button id="refresh_canister">refresh canisters</button>
         </section>
         <section id="canisters"></section>
     </div>
@@ -221,10 +218,10 @@ async function createProposal() {
   
   function load() { 
     console.log("windows load");
-    // let btn_refresh_proposal = document.getElementById("refresh_proposal");
-    // btn_refresh_proposal.onclick = load_proposals;
-    // let btn_refresh_canister = document.getElementById("refresh_canister");
-    // btn_refresh_canister.onclick = load_canisters;
+    let btn_refresh_members = document.getElementById("btn_refresh_members");
+    btn_refresh_members.onclick = load_members;
+    let btn_refresh_canister = document.getElementById("refresh_canister");
+    btn_refresh_canister.onclick = load_canisters;
   
     load_identity();
     load_members();
